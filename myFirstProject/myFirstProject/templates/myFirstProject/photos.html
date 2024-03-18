@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+На этой странице будут отображаться все картинки.
+<ul>
+    {% for p in posts %}
+    {% if p.is_published %}
+    <li>
+        <h2>{{p.title}}</h2>
+        <p ><a href="photos/{{p.id }}">{{p.content}}</a></p>
+        {% if not forloop.last %}
+        <hr>
+        {% endif %}
+    </li>
+    {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}
