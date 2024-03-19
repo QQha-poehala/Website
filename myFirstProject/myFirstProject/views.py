@@ -1,13 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, Http404
-
-
-data_db = [
-    {'id': 1, 'title': 'леопард', 'content': 'фото', 'is_published': True},
-    {'id': 2, 'title': 'котик', 'content': 'фото', 'is_published': True},
-    {'id': 3, 'title': 'бурундук', 'content': 'фото', 'is_published': False},
-    {'id': 4, 'title': 'лоси', 'content': 'фото', 'is_published': True},
-]
+from .models import Photo
 
 
 def index(request):
@@ -38,20 +31,29 @@ def comp(request):
 
 
 def photos(request):
+    photos = Photo.published.all()
+
     data = {
         'content': 'Картинки',
         'title': 'Картинки',
         'dict': {'key_1': 'Главная', 'key_2': 'Сравнить!', 'key_3': 'Картинки', 'key_4': 'Про нас'},
-        'posts': data_db,
+        'posts': photos,
     }
     return render(request, 'myFirstProject/photos.html', data)
 
 
-def photo(request, photo_id):
+def photo(request, photo_slug):
+    photo = get_object_or_404(Photo, slug=photo_slug)
 
-    if photo_id > 25:
-        return HttpResponseNotFound('<h1>Страница не найдена. Ошибка 404.</h1>')
-    return HttpResponse(f"<h1>фото </h1><p >id:{photo_id}</p>")
+    data = {
+        'title': photo.title,
+        'content': 'Картинка',
+        'name': photo.title,
+        'points': photo.points,
+        'dict': {'key_1': 'Главная', 'key_2': 'Сравнить!', 'key_3': 'Картинки', 'key_4': 'Про нас'},
+        'IMG': photo.content,
+    }
+    return render(request, 'myFirstProject/photo.html', data)
 
 
 def page404(request, exception):

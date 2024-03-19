@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{name}}</h1>
+Количество очков: {{points}}
+
+{% if photo.IMG %}
+<p><img class="img-article-left" src="photo.IMG.url"></p>
+{% endif %}
+{% endblock %}
