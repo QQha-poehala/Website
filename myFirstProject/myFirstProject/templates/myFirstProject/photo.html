@@ -1,10 +1,24 @@
 {% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<!-- Теги -->
+{% with photo.tags.all as tags %}
+{% if tags %}
+<ul class="tags-list">
+    <li>Теги:</li>
+    {% for t in tags %}
+    <li><a href="{{t.get_absolute_url}}">{{t.tag}}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+{% endblock %}
+
 {% block content %}
 
-<h1>{{name}}</h1>
+<h1>{{title}}</h1>
 Количество очков: {{points}}
-
-{% if photo.IMG %}
-<p><img class="img-article-left" src="photo.IMG.url"></p>
+{% if IMG %}
+<p><img src="{{photo.content.url}}"></p>
 {% endif %}
 {% endblock %}

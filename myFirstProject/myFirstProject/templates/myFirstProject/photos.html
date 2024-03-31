@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<ul>
+<ul class="list-articles">
     {% for p in posts %}
-    <li>
+    <li><div class="article-panel">
+        <p class="first">Категория: {{p.cat.name}}</p>
+        <p class="last">Дата: {{p.tim_update|date:"d-m-Y H:i:s"}}</p>
+        </div>
         <h2>{{p.title}}</h2>
+        {% autoescape off%}
+        {{p.content|linebreaks|truncatewords:40}}
+        {% endautoescape %}
+        <div class="clear"></div>
         <p class="link-read-photo"><a href="{{ p.get_absolute_url }}"> Информация... </a></p>
-        {% if not forloop.last %}
-        <hr>
-        {% endif %}
-    </li>
+        </li>
     {% endfor %}
 </ul>
 {% endblock %}

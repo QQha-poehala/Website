@@ -12,7 +12,9 @@ urlpatterns = [
     path('about-us', views.about, name='about'),
     path('compare', views.comp, name='compare'),
     path('photos', views.photos, name='photos'),
-    path('photos/<slug:photo_slug>/', views.photo, name='photo'),
+    path('photos/<slug:photo_slug>/', views.show_photo, name='photo'),
+    path('category/<slug:cat_slug>/', views.show_category, name='category'),
+    path('tag/<slug:tag_slug>/', views.show_tag_postlist, name='tag'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
