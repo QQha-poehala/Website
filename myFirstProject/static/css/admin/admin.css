@@ -1,0 +1,9 @@
+#header, .module caption, #changelist-filter h2{
+ background: #e8dcdc;
+}
+#header, site-name h1{
+    background: #4169E1;
+}
+div.breadcrumbs {
+ background: #4169E1;
+}
