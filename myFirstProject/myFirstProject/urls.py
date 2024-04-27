@@ -10,6 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='home'),
     path('about-us', views.about, name='about'),
+    path('addpage', views.addpage, name='addpage'),
     path('compare', views.comp, name='compare'),
     path('photos', views.photos, name='photos'),
     path('photos/<slug:photo_slug>/', views.show_photo, name='photo'),

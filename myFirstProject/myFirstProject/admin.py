@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.utils.safestring import mark_safe
 from .models import Photo, Category
 
 
@@ -21,12 +22,11 @@ class AuthorFilter(admin.SimpleListFilter):
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
-    fields = ['title', 'content', 'slug', 'cat', 'author', 'tags']
-    #exclude = ['tags', 'is_published']
-    #readonly_fields = ['slug']
+    fields = ['title', 'content', 'slug', 'cat', 'author','post_photo', 'tags']
+    readonly_fields = ['post_photo']
     prepopulated_fields = {"slug": ("title",)}
     filter_horizontal = ['tags']
-    list_display = ('title', 'tim_create', 'is_published', 'cat', 'info')
+    list_display = ('title', 'post_photo', 'tim_create', 'is_published', 'cat')
     list_display_links = ('title', )
     ordering = ['tim_create', 'title']
     list_editable = ('is_published',)
@@ -35,10 +35,15 @@ class PhotoAdmin(admin.ModelAdmin):
     search_fields = ['title__startswith', 'cat__name']
     list_filter = ['cat__name', 'is_published']
     list_filter = [AuthorFilter, 'cat__name', 'is_published']
+    safe_on_top = True
 
-    @admin.display(description="Описание", ordering='content')
-    def info(self, photo: Photo):
-        return f"Описание {len(photo.content)} символ."
+
+    @admin.display(description="Фото", ordering='content')
+    def post_photo(self, photo: Photo):
+        if photo.content:
+            return mark_safe(f"<img src='{photo.content.url}' width=50>")
+        else:
+            return "Без фото"
 
     @admin.action(description="Опубликовать выбранные записи")
     def set_published(self, request, queryset):

@@ -1,6 +1,7 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 
 
 def translit_to_eng(s: str) -> str:
@@ -27,9 +28,8 @@ class Photo(models.Model):
         PUBLISHED = 1, 'Опубликовано'
     title = models.CharField(max_length=255, verbose_name="Заголовок")
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="Slug")
-    content = models.ImageField(upload_to='media/img', null=True, blank=True, verbose_name="Фото")
-    place = models.IntegerField(verbose_name="Место")
-    points = models.IntegerField(verbose_name="Очки")
+    content = models.ImageField( null=True, blank=True, verbose_name="Фото")
+    points = models.IntegerField(verbose_name="Очки", null=True, default=400)
     tim_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     tim_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
     is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)), default=Status.DRAFT, verbose_name="Статус")
@@ -55,9 +55,6 @@ class Photo(models.Model):
     def get_absolute_url(self):
         return reverse('photo', kwargs={'photo_slug': self.slug})
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title, allow_unicode=True)
-        super().save(*args, **kwargs)
 
 
 class Category(models.Model):
