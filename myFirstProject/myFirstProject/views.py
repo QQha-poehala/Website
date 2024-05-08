@@ -1,8 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.urls import reverse_lazy
 from .models import Photo, Category, TagPost
 from .forms import AddPostForm
+from .utils import DataMixin
 import uuid
+from django.views import View
+from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
+from django.core.paginator import Paginator
 
 
 def index(request):
@@ -23,7 +28,7 @@ def about(request):
     return render(request, 'myFirstProject/about.html', data)
 
 
-def comp(request):
+def comp( request):
     data = {
         'content': 'Сравнение',
         'title': 'Сравнение',
@@ -32,90 +37,80 @@ def comp(request):
     return render(request, 'myFirstProject/compare.html', data)
 
 
-def photos(request):
-    photos = Photo.published.all()
-
-    data = {
-        'content': 'Картинки',
-        'title': 'Картинки',
-        'dict': {'key_1': 'Главная', 'key_2': 'Сравнить!', 'key_3': 'Картинки', 'key_4': 'Про нас', 'key_5': 'Добавить картинку'},
-        'posts': photos,
-        'cat_selected': 0,
-    }
-    return render(request, 'myFirstProject/photos.html', data)
+class PhotosHome(DataMixin, ListView):
+    template_name = 'myFirstProject/photos.html'
+    context_object_name = 'posts'
+    title_page = 'Картинки'
+    cat_selected = 0
+    def get_queryset(self):
+        return Photo.published.all().select_related('cat')
 
 
-def show_photo(request, photo_slug):
-    photo = get_object_or_404(Photo, slug=photo_slug)
+class ShowPost(DataMixin, DetailView):
+    template_name = 'myFirstProject/photo.html'
+    slug_url_kwarg = 'photo_slug'
+    context_object_name = 'photo'
 
-    data = {
-        'title': photo.title,
-        'content': 'Картинка',
-        'points': photo.points,
-        'dict': {'key_1': 'Главная', 'key_2': 'Сравнить!', 'key_3': 'Картинки', 'key_4': 'Про нас', 'key_5': 'Добавить картинку'},
-        'IMG': photo.content,
-        'photo': photo,
-        'cat_selected': 1,
-    }
-    return render(request, 'myFirstProject/photo.html', data)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return self.get_mixin_context(context, points=context['photo'].points, IMG=context['photo'].content,
+                                      title=context['photo'].title, content='Картинка')
 
-
-def show_category(request, cat_slug):
-    category = get_object_or_404(Category, slug=cat_slug)
-    posts = Photo.published.filter(cat_id=category.pk)
-    data = {
-        'title': f'Рубрика:{category.name}',
-        'posts': posts,
-        'dict': {'key_1': 'Главная', 'key_2': 'Сравнить!', 'key_3': 'Картинки', 'key_4': 'Про нас', 'key_5': 'Добавить картинку'},
-        'cat_selected': category.pk,
-    }
-    return render(request, 'myFirstProject/photos.html', context=data)
+    def get_object(self, queryset=None):
+        return get_object_or_404(Photo.published, slug=self.kwargs[self.slug_url_kwarg])
 
 
-def show_tag_postlist(request, tag_slug):
-    tag = get_object_or_404(TagPost, slug=tag_slug)
-    posts = tag.tags.filter(is_published=Photo.Status.PUBLISHED)
+class PhotosCategory(DataMixin, ListView):
+    template_name = 'myFirstProject/photos.html'
+    context_object_name = 'posts'
+    content_page = 'Картинки'
+    allow_empty = False
+    def get_queryset(self):
+        return Photo.published.filter(cat__slug=self.kwargs['cat_slug']).select_related('cat')
 
-    data = {
-        'title': f'Тег:{tag.tag}',
-        'posts': posts,
-        'dict': {'key_1': 'Главная', 'key_2': 'Сравнить!', 'key_3': 'Картинки', 'key_4': 'Про нас',
-                 'key_5': 'Добавить картинку'},
-        'cat_selected': None,
-    }
-    return render(request, 'myFirstProject/photos.html', context=data)
-
-
-# def handle_uploaded_file(f):
-#     name = f.name
-#     ext = ''
-#     if '.' in name:
-#         ext = name[name.rindex('.'):]
-#         name = name[:name.rindex('.')]
-#     suffix = str(uuid.uuid4())
-#
-#     with open(f"uploads/{f.name}", "wb+") as destination:
-#         for chunk in f.chunks():
-#             destination.write(chunk)
-#
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cat = context['posts'][0].cat
+        return self.get_mixin_context(context,
+                                      title='Категория -' + cat.name,
+                                      cat_selected=cat.pk,
+                                      )
 
 
-def addpage(request):
-    if request.method == 'POST':
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = AddPostForm()
-    data = {
-        'content': 'Добавление фото',
-        'title': 'Добавление фото',
-        'form':  form,
-        'dict': {'key_1': 'Главная', 'key_2': 'Сравнить!', 'key_3': 'Картинки', 'key_4': 'Про нас',
-                 'key_5': 'Добавить картинку'}
-    }
-    return render(request, 'myFirstProject/addpage.html', context=data)
+class TagPostList(DataMixin, ListView):
+    template_name = 'myFirstProject/photos.html'
+    context_object_name = 'posts'
+    allow_empty = False
+
+    def get_context_data(self, *, object_list=None,**kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = TagPost.objects.get(slug=self.kwargs['tag_slug'])
+        return self.get_mixin_context(context, title='Тег: ' + tag.tag)
+
+    def get_queryset(self):
+        return Photo.published.filter(tags__slug=self.kwargs['tag_slug']).select_related('cat')
+
+
+class AddPage(DataMixin, CreateView):
+    form_class = AddPostForm
+    template_name = 'myFirstProject/addpage.html'
+    success_url = reverse_lazy('home')
+    title_page = 'Добавление фото'
+
+
+class UpdatePage(DataMixin, UpdateView):
+    model = Photo
+    fields = ['title',  'content', 'is_published', 'cat']
+    template_name = 'myFirstProject/addpage.html'
+    success_url = reverse_lazy('home')
+    title_page = 'Редактирование фото'
+
+
+class DeletePage(DataMixin, DeleteView):
+    model = Photo
+    template_name = 'myFirstProject/addpage.html'
+    success_url = reverse_lazy('home')
+    title_page = 'Удаление записи'
 
 
 def page404(request, exception):
