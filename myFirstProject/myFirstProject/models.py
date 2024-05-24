@@ -2,7 +2,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.core.validators import MinLengthValidator, MaxLengthValidator
-
+from django.contrib.auth import get_user_model
 
 def translit_to_eng(s: str) -> str:
     d = {'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д':
@@ -37,7 +37,7 @@ class Photo(models.Model):
     tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name="Тэг")
     author = models.OneToOneField('Author', on_delete=models.SET_NULL, null=True,
                                   blank=True, related_name='pho', verbose_name="Автор")
-
+    site_user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, related_name='posts', null=True, default=None)
     objects = models.Manager()
     published = PublishedManager()
 

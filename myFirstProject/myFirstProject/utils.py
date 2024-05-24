@@ -1,8 +1,9 @@
-menu = {'key_1': 'Главная',
-        'key_2': 'Сравнить!',
-        'key_3': 'Картинки',
-        'key_4': 'Про нас',
-        'key_5': 'Добавить картинку'}
+menu = [{'key': 'Главная', 'url_name': 'home'},
+        {'key': 'Сравнить!', 'url_name': 'compare'},
+        {'key': 'Картинки', 'url_name': 'photos'},
+        {'key': 'Про нас', 'url_name': 'about'},
+        {'key': 'Добавить картинку', 'url_name': 'addpage'}
+        ]
 
 
 class DataMixin:
@@ -18,13 +19,11 @@ class DataMixin:
             self.extra_context['content'] = self.title_page
         if self.content_page:
             self.extra_context['content'] = self.content_page
-        if 'dict' not in self.extra_context:
-            self.extra_context['dict'] = menu
+
         if self.cat_selected is not None:
             self.extra_context['cat_selected'] = self.cat_selected
 
     def get_mixin_context(self, context, **kwargs):
-        context['dict'] = menu
         context['cat_selected'] = None
         context.update(kwargs)
         return context

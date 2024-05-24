@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block breadcrumbs %}
+{% if perms.myFirstProject.change_photo %}
+<p ><a href="{% url 'edit_page' photo.slug%}">Редактировать</a></p>
+{% endif %}
 <!-- Теги -->
 {% with photo.tags.all as tags %}
 {% if tags %}

@@ -2,10 +2,13 @@ from django import template
 from django.db.models import Count
 import myFirstProject.views as views
 from myFirstProject.models import Category, TagPost
-
+from myFirstProject.utils import menu
 
 register = template.Library()
 
+@register.simple_tag
+def get_menu():
+    return menu
 
 @register.inclusion_tag('myFirstProject/list_categories.html')
 def show_categories(cat_selected=0):

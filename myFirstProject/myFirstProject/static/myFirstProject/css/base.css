@@ -5,3 +5,8 @@ body {
     height: 100vh;
     font-weight: bold;
 }
+nav {
+    width: 960px;
+    position: relative;
+    margin: 0 auto;
+}

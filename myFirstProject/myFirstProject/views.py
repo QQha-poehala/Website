@@ -8,6 +8,8 @@ import uuid
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 def index(request):
@@ -19,6 +21,7 @@ def index(request):
     return render(request, 'myFirstProject/index.html', data)
 
 
+@login_required
 def about(request):
     data = {
         'content': 'О нас',
@@ -91,19 +94,31 @@ class TagPostList(DataMixin, ListView):
         return Photo.published.filter(tags__slug=self.kwargs['tag_slug']).select_related('cat')
 
 
-class AddPage(DataMixin, CreateView):
+class AddPage(PermissionRequiredMixin, LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'myFirstProject/addpage.html'
     success_url = reverse_lazy('home')
     title_page = 'Добавление фото'
+    permission_required = 'myFirstProject.add_photo'
+
+    def form_valid(self, form):
+        w = form.save(commit=False)
+        w.site_user = self.request.user
+        return super().form_valid(form)
 
 
-class UpdatePage(DataMixin, UpdateView):
+class UpdatePage(PermissionRequiredMixin,DataMixin, UpdateView):
     model = Photo
     fields = ['title',  'content', 'is_published', 'cat']
     template_name = 'myFirstProject/addpage.html'
     success_url = reverse_lazy('home')
     title_page = 'Редактирование фото'
+    permission_required = 'myFirstProject.change_photo'
+
+
+# @permission_required(perm='myFirstProject.view_photo',raise_exception=True)
+# def contact(request):
+#     return HttpResponse("Обратная связь")
 
 
 class DeletePage(DataMixin, DeleteView):
