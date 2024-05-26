@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{title|capfirst}}</title>
+    <title>{{title}}</title>
     <link rel="stylesheet" type="text/css" href="{% static 'myFirstProject/css/styles.css' %}"  />
     <link rel="stylesheet" type="text/css" href="{% static 'myFirstProject/css/base.css' %}"  />
     <link rel="shortcut icon"  href="{% static 'myFirstProject/images/main.ico' %}" type="image/x-icon" />
@@ -30,7 +30,6 @@
             <a href="/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
         <span class="fs-4"> {{content}}</span>
       </a>
-
         <nav class="d-flex justify-content-center">
         {% get_menu as menu%}
         {%for m in mainmenu%}

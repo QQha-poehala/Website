@@ -23,7 +23,7 @@ class AddPostForm(forms.ModelForm):
     author = forms.ModelChoiceField(queryset=Author.objects.all(), empty_label="Нет автора", required=False, label="Автор")
     class Meta:
         model = Photo
-        fields = ['title', 'slug', 'content', 'is_published',
+        fields = ['title', 'slug', 'content',
                   'cat', 'author', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-input'}),
@@ -35,9 +35,6 @@ class AddPostForm(forms.ModelForm):
         if len(title) > 50:
             raise ValidationError('Длина превышает 50 символов')
         return title
-
-
-
 
 
 

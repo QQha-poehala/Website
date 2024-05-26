@@ -1,6 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
-Привет! Это главная страница сайта. Здесь будет отображаться топ рейтинга сайта с {{x}} вариантами.
+Привет! Это главная страница сайта. Здесь отображается топ рейтинга картинок.
+<br/><br/>
+<style>
+.demotable {
+  border-collapse: collapse;
+  counter-reset: schetchik;
+}
+.demotable tbody tr:nth-child(n+2) {
+  counter-increment: schetchik;
+}
+.demotable td,
+.demotable tbody tr:before {
+  padding: .1em .5em;
+  border: 1px solid #E7D5C0;
+}
+.demotable tbody tr:before {
+  display: table-cell;
+  vertical-align: middle;
+}
+.demotable tbody tr:before,
+.demotable b:after {
+  content: counter(schetchik);
+  color: #978777;
+}
+.demotable tbody tr:nth-child(-n+1):before {
+  content: "";
+}
+</style>
+
+<table class="demotable">
+  <tbody>
+    <tr><td>Название<td>Очки<td>Ссылка
+    {% for p in posts %}
+    <tr><td>{{p.title}}<td>{{p.points}}<td><p class="link-read-photo"><a href="{{ p.get_absolute_url }}"> {{p.content}} </a></p>
+    {% endfor %}
+  <tfoot>
+</table>
+
 {% endblock %}
 
 

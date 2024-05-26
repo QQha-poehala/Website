@@ -1,5 +1,5 @@
 menu = [{'key': 'Главная', 'url_name': 'home'},
-        {'key': 'Сравнить!', 'url_name': 'compare'},
+        {'key': 'Оценить!', 'url_name': 'assess'},
         {'key': 'Картинки', 'url_name': 'photos'},
         {'key': 'Про нас', 'url_name': 'about'},
         {'key': 'Добавить картинку', 'url_name': 'addpage'}
@@ -7,7 +7,7 @@ menu = [{'key': 'Главная', 'url_name': 'home'},
 
 
 class DataMixin:
-    paginate_by = 5
+    #paginate_by = 5
     title_page = None
     content_page = None
     cat_selected = None

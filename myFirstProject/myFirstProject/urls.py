@@ -10,10 +10,10 @@ from django.conf import settings
 handler404 = 'myFirstProject.views.page404'
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='home'),
+    path('', views.Index.as_view(), name='home'),
     path('about-us', views.about, name='about'),
     path('addpage/', views.AddPage.as_view(), name='addpage'),
-    path('compare', views.comp, name='compare'),
+    path('assess/', views.Assess.as_view(), name='assess'),
     path('photos', views.PhotosHome.as_view(), name='photos'),
     path('photos/<slug:photo_slug>/', views.ShowPost.as_view(), name='photo'),
     path('category/<slug:cat_slug>/', views.PhotosCategory.as_view(), name='category'),

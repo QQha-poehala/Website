@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+select {
+       width: 200px; /* Ширина списка */
+       height: 200px; /* Высота списка */
+       font-size: 20px; /* Размер шрифта */
+}
+</style>
+{% if user.assess_true == 0 %}
+{% for p in posts %}
+<p>{{p.title}}</p>
+{% if p.content %}
+<p ><img src="{{ p.content.url }}"> {% else %}
+<p ><img src="{{ default_image }}">{% endif %}
+    {% endfor %}
+    <p> Выберите фотографии, который понравились:</p>
+    <form id="assessment-form" method="post" action="{% url 'assess' %}">
+        {% csrf_token %}
+        <select id="selected-photos" name="selected_photos" multiple>
+            {% for photo in posts %}
+            <option value="{{ photo.id }}">{{ photo.title }}</option>
+            {% endfor %}
+        </select>
+<button type="submit">Оценить</button>
+</form>
+
+{% else %}
+<p> Вы уже оценивали все фотографии!</p>
+{% endif %}
+
+{% endblock %}
